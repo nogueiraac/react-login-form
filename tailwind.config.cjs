@@ -26,6 +26,10 @@ module.exports = {
       cyan: {
         500: '#81d8f7',
         300: '#9BE1FB'   
+      },
+      red: {
+        600: '#dc2626',
+        700: '#b91c1c'
       }
     },
     extend: {

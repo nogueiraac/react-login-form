@@ -11,13 +11,13 @@ interface FormProps {
 }
 
 function App() {
-  const { handleSubmit, control, reset } = useForm();
+  const { handleSubmit, control, reset, formState: { errors} } = useForm();
 
   const onSubmit = (value: any) => {
     console.log(value);
     reset();
   };
-
+  
   return (
     <div className='w-full h-screen flex flex-col'>
       <div id="wrapper" className="bg-gray-900 w-full h-screen flex items-center justify-center flex-col">
@@ -58,13 +58,25 @@ function App() {
                   name="senha"
                   control={control}
                   defaultValue=""
+                  rules={{ required: true, minLength: 8 }}
                   render={({ field: { onChange, value} }) => (
-                    <TextInput.Root>
-                      <TextInput.Icon>
-                        <Lock className='text-xl'/>
-                      </TextInput.Icon>
-                      <TextInput.Input value={value} onChange={onChange} type="password" placeholder='Senha'/>
-                    </TextInput.Root>
+                    <> 
+                      <TextInput.Root>
+                        <TextInput.Icon>
+                          <Lock className='text-xl'/>
+                        </TextInput.Icon>
+                        <TextInput.Input 
+                          value={value} 
+                          onChange={onChange}
+                          type="password" 
+                          placeholder='Senha'
+                        />
+                      </TextInput.Root>
+                      {/* { errors.senha !== undefined
+                        ? <p className="text-xs text-red-700">A senha deve conter pelo menos 8 caracteres</p>
+                        : ''
+                      } */}
+                    </>
                   )}
                 />
               </div>
