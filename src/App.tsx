@@ -1,8 +1,12 @@
 import Button from './components/Button';
 import { TextInput } from './components/InputText';
 import { Envelope, Lock, User, GithubLogo, LinkedinLogo } from 'phosphor-react';
+import { ToastContainer, toast } from 'react-toastify';
 import { useForm, Controller } from 'react-hook-form';
+
 import './styles/global.css';
+import 'react-toastify/dist/ReactToastify.css';
+import { useEffect } from 'react';
 
 interface FormProps {
   usuario: string;
@@ -11,16 +15,29 @@ interface FormProps {
 }
 
 function App() {
-  const { handleSubmit, control, reset, formState: { errors} } = useForm();
+  const { handleSubmit, control, reset, formState: { errors} } = useForm<FormProps>();
+
+  useEffect(() => {
+    if ( errors.email || errors.senha) {
+      toast.error("Ops! Parece que algo deu errado :(", {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    }
+  }, [errors])
+
+
 
   const onSubmit = (value: any) => {
-    console.log(value);
+    toast.success("Formulário enviado", {
+      position: toast.POSITION.TOP_RIGHT
+    }); 
     reset();
   };
   
   return (
     <div className='w-full h-screen flex flex-col'>
       <div id="wrapper" className="bg-gray-900 w-full h-screen flex items-center justify-center flex-col">
+        <ToastContainer />
         <div id="wrapper-form" className='w-2/6 -lg:w-4/6 p-8 rounded bg-gray-800 flex flex-col gap-4'>
           <div id="header-form" className='w-full flex items-center justify-center flex-col'>
             <p className='text-white text-2xl -lg:text-xl'>Crie sua conta</p>
@@ -29,7 +46,7 @@ function App() {
             <div className='flex flex-col gap-4'>
               <div id="form-group" className='flex flex-col gap-2'>
                 <Controller
-                  name="usuário"
+                  name="usuario"
                   control={control}
                   defaultValue=""
                   render={({ field: { onChange, value} }) => (
@@ -42,23 +59,33 @@ function App() {
                   )}
                 />
                 <Controller
-                  name="e-mail"
+                  name="email"
                   control={control}
                   defaultValue=""
+                  rules={{ required: true, pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Tem que ser um e-mail válido"
+                  }}}
                   render={({ field: { onChange, value} }) => (
-                    <TextInput.Root>
-                      <TextInput.Icon>
-                        <Envelope className='text-xl'/>
-                      </TextInput.Icon>
-                      <TextInput.Input value={value} onChange={onChange} type="email" placeholder='E-mail'/>
-                    </TextInput.Root>
+                    <>
+                      <TextInput.Root>
+                        <TextInput.Icon>
+                          <Envelope className='text-xl'/>
+                        </TextInput.Icon>
+                        <TextInput.Input value={value} onChange={onChange}  placeholder='E-mail'/>
+                      </TextInput.Root>
+                      {
+                        errors.email && 
+                          <span className="text-red-600">{errors.email?.message}</span>
+                      }
+                    </>
                   )}
                 />
                 <Controller
                   name="senha"
                   control={control}
                   defaultValue=""
-                  rules={{ required: true, minLength: 8 }}
+                  rules={{ required: true, minLength: { value: 8, message: "Senha tem que possuir no mínimo 8 caracteres" }}}
                   render={({ field: { onChange, value} }) => (
                     <> 
                       <TextInput.Root>
@@ -72,10 +99,7 @@ function App() {
                           placeholder='Senha'
                         />
                       </TextInput.Root>
-                      {/* { errors.senha !== undefined
-                        ? <p className="text-xs text-red-700">A senha deve conter pelo menos 8 caracteres</p>
-                        : ''
-                      } */}
+                      {errors.senha && <span className="text-red-600">{errors.senha?.message}</span>}
                     </>
                   )}
                 />
